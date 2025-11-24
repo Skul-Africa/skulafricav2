@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { ParentSidebar } from '@/components/parent/ParentSidebar';
+import { ParentHeader } from '@/components/parent/ParentHeader';
 import { useParams, useRouter } from 'next/navigation';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { AdminHeader } from '@/components/admin/AdminHeader';
+import { useEffect } from 'react';
 
-export default function AdminLayout({
+export default function ParentDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,18 +15,18 @@ export default function AdminLayout({
   const subdomain = params.subdomain as string;
 
   useEffect(() => {
-    // Check if admin is logged in
-    const adminSession = localStorage.getItem(`${subdomain}-current-admin`);
-    if (!adminSession) {
-      router.push(`/school/${subdomain}/admin`);
+    // Check if parent is logged in
+    const currentParent = localStorage.getItem(`${subdomain}-current-parent`);
+    if (!currentParent) {
+      router.push(`/school/${subdomain}/parent`);
     }
   }, [subdomain, router]);
 
   return (
     <div className="min-h-screen bg-neutral-950 flex">
-      <AdminSidebar />
+      <ParentSidebar />
       <div className="flex-1 flex flex-col">
-        <AdminHeader />
+        <ParentHeader />
         <main className="flex-1 p-6">
           {children}
         </main>
