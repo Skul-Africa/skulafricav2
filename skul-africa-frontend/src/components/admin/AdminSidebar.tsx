@@ -39,6 +39,7 @@ export function AdminSidebar() {
     { href: `/school/${subdomain}/admin/dashboard/results`, label: 'Results', icon: BarChart3 },
     { href: `/school/${subdomain}/admin/dashboard/payments`, label: 'Payments', icon: DollarSign },
     { href: `/school/${subdomain}/admin/dashboard/notifications`, label: 'Notifications', icon: BarChart3 },
+    { href: `/school/${subdomain}/admin/customize`, label: 'Website Customization', icon: Settings },
   ];
 
   return (

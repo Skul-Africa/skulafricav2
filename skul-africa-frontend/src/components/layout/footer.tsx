@@ -1,104 +1,88 @@
 import Link from "next/link";
-import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, GraduationCap, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
     return (
-        <footer className="bg-black text-white border-t border-neutral-900">
-            <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <footer className="bg-black text-white border-t border-neutral-900 pt-20 pb-10">
+            <div className="container mx-auto px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Brand */}
-                    <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-primary">Skul Africa</h3>
-                        <p className="text-neutral-400 text-sm">
-                            Empowering education through technology. Connecting students, schools, and businesses across Africa.
+                    <div className="space-y-6">
+                        <Link href="/" className="flex items-center space-x-2 group">
+                            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/50 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                                <GraduationCap className="w-6 h-6 text-white" />
+                            </div>
+                            <span className="text-xl font-bold text-white tracking-tight">Skul Africa</span>
+                        </Link>
+                        <p className="text-neutral-400 text-sm leading-relaxed max-w-xs">
+                            Empowering the next generation of African education through cutting-edge technology and seamless connectivity.
                         </p>
                         <div className="flex space-x-4">
-                            <Link href="#" className="text-neutral-400 hover:text-primary transition-colors">
-                                <Facebook size={20} />
-                            </Link>
-                            <Link href="#" className="text-neutral-400 hover:text-primary transition-colors">
-                                <Twitter size={20} />
-                            </Link>
-                            <Link href="#" className="text-neutral-400 hover:text-primary transition-colors">
-                                <Instagram size={20} />
-                            </Link>
-                            <Link href="#" className="text-neutral-400 hover:text-primary transition-colors">
-                                <Linkedin size={20} />
-                            </Link>
+                            {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
+                                <Link key={i} href="#" className="w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-neutral-400 hover:bg-primary hover:text-white transition-all duration-300">
+                                    <Icon size={18} />
+                                </Link>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Product */}
                     <div>
-                        <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-                        <ul className="space-y-2 text-sm text-neutral-400">
-                            <li>
-                                <Link href="/about" className="hover:text-primary transition-colors">
-                                    About Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/features" className="hover:text-primary transition-colors">
-                                    Features
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/pricing" className="hover:text-primary transition-colors">
-                                    Pricing
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/contact" className="hover:text-primary transition-colors">
-                                    Contact
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Legal */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">Legal</h4>
-                        <ul className="space-y-2 text-sm text-neutral-400">
-                            <li>
-                                <Link href="/privacy" className="hover:text-primary transition-colors">
-                                    Privacy Policy
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/terms" className="hover:text-primary transition-colors">
-                                    Terms of Service
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/cookies" className="hover:text-primary transition-colors">
-                                    Cookie Policy
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+                        <h4 className="text-lg font-bold mb-6 text-white">Product</h4>
                         <ul className="space-y-4 text-sm text-neutral-400">
-                            <li className="flex items-start space-x-3">
-                                <MapPin size={18} className="text-primary shrink-0 mt-0.5" />
-                                <span>123 Education Lane, Lagos, Nigeria</span>
-                            </li>
-                            <li className="flex items-center space-x-3">
-                                <Phone size={18} className="text-primary shrink-0" />
-                                <span>+234 123 456 7890</span>
-                            </li>
-                            <li className="flex items-center space-x-3">
-                                <Mail size={18} className="text-primary shrink-0" />
-                                <span>hello@skulafrica.com</span>
-                            </li>
+                            {["Features", "Pricing", "Case Studies", "Reviews", "Updates"].map((item) => (
+                                <li key={item}>
+                                    <Link href="#" className="hover:text-primary transition-colors flex items-center group">
+                                        <span className="w-0 group-hover:w-2 transition-all duration-300 h-px bg-primary mr-0 group-hover:mr-2"></span>
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
+                    </div>
+
+                    {/* Company */}
+                    <div>
+                        <h4 className="text-lg font-bold mb-6 text-white">Company</h4>
+                        <ul className="space-y-4 text-sm text-neutral-400">
+                            {["About Us", "Careers", "Blog", "Contact", "Partners"].map((item) => (
+                                <li key={item}>
+                                    <Link href="#" className="hover:text-primary transition-colors flex items-center group">
+                                        <span className="w-0 group-hover:w-2 transition-all duration-300 h-px bg-primary mr-0 group-hover:mr-2"></span>
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Newsletter */}
+                    <div>
+                        <h4 className="text-lg font-bold mb-6 text-white">Stay Updated</h4>
+                        <p className="text-neutral-400 text-sm mb-4">
+                            Subscribe to our newsletter for the latest updates and educational insights.
+                        </p>
+                        <div className="flex flex-col space-y-3">
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+                                className="bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            />
+                            <Button className="bg-primary hover:bg-primary/90 text-white w-full">
+                                Subscribe
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="border-t border-neutral-900 mt-12 pt-8 text-center text-sm text-neutral-500">
+                <div className="border-t border-neutral-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
                     <p>&copy; {new Date().getFullYear()} Skul Africa. All rights reserved.</p>
+                    <div className="flex space-x-6">
+                        <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+                        <Link href="#" className="hover:text-white transition-colors">Cookie Settings</Link>
+                    </div>
                 </div>
             </div>
         </footer>
