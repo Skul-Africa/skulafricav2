@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 
+import Logo from "@/assets/logo.jpg"; 
+import Image from "next/image";
+
+
+
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-primary selection:text-white font-sans">
@@ -16,13 +22,15 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid-pattern.svg')] opacity-10" />
 
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            <span className="text-sm font-medium text-neutral-300">The #1 School Management Platform in Africa</span>
-          </div>
+         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+<div className="relative flex h-8 w-8">
+  <Image src={Logo} alt="Skul Africa Logo" className="rounded-full object-cover" />
+</div>
+
+
+  <span className="text-sm font-medium text-neutral-300">The #1 School Management Platform in Africa</span>
+</div>
+
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-neutral-500 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
             Build Your School's <br />
