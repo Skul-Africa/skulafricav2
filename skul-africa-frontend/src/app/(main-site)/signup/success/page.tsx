@@ -15,7 +15,9 @@ function getOrigin() {
   return 'http://localhost:3000'; // Fallback for SSR
 }
 
-export default function MainSignupSuccessPage() {
+import { Suspense } from 'react';
+
+function SignupSuccessContent() {
   const searchParams = useSearchParams();
   const subdomain = searchParams.get('subdomain');
   const schoolName = searchParams.get('name');
@@ -237,5 +239,13 @@ export default function MainSignupSuccessPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function MainSignupSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+      <SignupSuccessContent />
+    </Suspense>
   );
 }

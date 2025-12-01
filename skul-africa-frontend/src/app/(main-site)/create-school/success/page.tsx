@@ -6,7 +6,9 @@ import { CheckCircle, ArrowRight, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
-export default function SuccessPage() {
+import { Suspense } from "react";
+
+function SuccessContent() {
     const searchParams = useSearchParams();
     const subdomain = searchParams.get("subdomain");
     const [schoolData, setSchoolData] = useState<any>(null);
@@ -71,5 +73,13 @@ export default function SuccessPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SuccessPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>}>
+            <SuccessContent />
+        </Suspense>
     );
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { GraduationCap, Mail, ArrowLeft, ArrowRight } from "lucide-react";
+import { GraduationCap, Mail, ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ForgotPasswordPage() {

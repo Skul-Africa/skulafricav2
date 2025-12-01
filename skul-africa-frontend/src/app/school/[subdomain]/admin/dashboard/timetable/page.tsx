@@ -34,10 +34,10 @@ export default function TimetableManagementPage() {
       try {
         const relData = await getSchoolRelationships(subdomain);
         setRelationships(relData);
-        
+
         const timetableData = getTimetables(subdomain);
         setTimetable(timetableData);
-        
+
         // Set default class
         if (relData.students.length > 0) {
           const firstClass = [...new Set(relData.students.map((s: any) => s.class))][0];
@@ -53,8 +53,8 @@ export default function TimetableManagementPage() {
     loadData();
   }, [subdomain]);
 
-  const classes = [...new Set(relationships.students?.map((s: any) => s.class) || [])];
-  const filteredTimetable = selectedClass 
+  const classes = [...new Set(relationships.students?.map((s: any) => s.class) || [])] as string[];
+  const filteredTimetable = selectedClass
     ? timetable.filter(entry => entry.class === selectedClass)
     : timetable;
 
@@ -190,7 +190,7 @@ export default function TimetableManagementPage() {
               <CardTitle className="text-white">Add Timetable Entry</CardTitle>
             </CardHeader>
             <CardContent>
-              <TimetableForm 
+              <TimetableForm
                 classes={classes}
                 teachers={relationships.teachers || []}
                 onSubmit={handleAddTimetableEntry}
