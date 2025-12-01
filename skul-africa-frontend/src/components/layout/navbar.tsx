@@ -47,14 +47,14 @@ export function Navbar() {
                 </div>
 
                 <div className="hidden md:flex items-center space-x-4">
-                    <Link href="/login">
+                    <Link href="/create-school">
                         <Button variant="ghost" className="text-neutral-300 hover:text-white hover:bg-white/5">
-                            Login
+                            Get Started
                         </Button>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/create-school">
                         <Button className="bg-primary hover:bg-primary/90 text-white border-0 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 rounded-full px-6">
-                            Get Started
+                            Create School Now
                         </Button>
                     </Link>
                 </div>
@@ -81,14 +81,14 @@ export function Navbar() {
                             </Link>
                         ))}
                         <div className="flex flex-col space-y-4 w-full max-w-xs pt-8 border-t border-neutral-800">
-                            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                            <Link href="/create-school" onClick={() => setMobileMenuOpen(false)}>
                                 <Button variant="outline" className="w-full border-neutral-700 text-white hover:bg-neutral-800 h-12 text-lg">
-                                    Login
+                                    Get Started
                                 </Button>
                             </Link>
-                            <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                            <Link href="/create-school" onClick={() => setMobileMenuOpen(false)}>
                                 <Button className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-lg shadow-lg shadow-primary/20">
-                                    Get Started
+                                    Create School Now
                                 </Button>
                             </Link>
                         </div>

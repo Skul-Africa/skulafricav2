@@ -34,9 +34,9 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-            <Link href="/register">
+            <Link href="/create-school">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-10 py-7 text-lg rounded-full shadow-[0_0_40px_-10px_rgba(229,9,20,0.5)] hover:shadow-[0_0_60px_-10px_rgba(229,9,20,0.6)] transition-all duration-300 group">
-                Start for Free <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                Create School Now <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Link href="#how-it-works">
@@ -239,9 +239,9 @@ export default function Home() {
           <p className="text-xl text-neutral-400 mb-12 max-w-2xl mx-auto">
             Join the fastest growing network of modern schools in Africa. No credit card required.
           </p>
-          <Link href="/register">
+          <Link href="/create-school">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-12 py-8 text-xl rounded-full shadow-[0_0_50px_-10px_rgba(229,9,20,0.5)] hover:shadow-[0_0_60px_-10px_rgba(229,9,20,0.6)] transition-all duration-300 hover:scale-105">
-              Create Your School Now
+              Create School Now
             </Button>
           </Link>
           <p className="mt-6 text-sm text-neutral-500">Free 14-day trial • Cancel anytime • No setup fees</p>
