@@ -1,37 +1,53 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
-
-// Mock teacher data
-const mockTeachers = [
-  {
-    id: '1',
-    name: 'Dr. Adebayo Johnson',
-    email: 'adebayo.johnson@school.edu',
-    subject: 'Mathematics',
-    phone: '+234 801 234 5678',
-    status: 'Active',
-  },
-  {
-    id: '2',
-    name: 'Mrs. Fatima Ibrahim',
-    email: 'fatima.ibrahim@school.edu',
-    subject: 'English Literature',
-    phone: '+234 802 345 6789',
-    status: 'Active',
-  },
-  {
-    id: '3',
-    name: 'Mr. Chukwuemeka Nwosu',
-    email: 'chukwuemeka.nwosu@school.edu',
-    subject: 'Physics',
-    phone: '+234 803 456 7890',
-    status: 'Active',
-  },
-];
+import { Plus, Search, Edit, Trash2, Loader2 } from 'lucide-react';
+import { getAllTeachers, deleteTeacher } from '@/lib/api';
+import { Teacher } from '@/types/api';
+import { toast } from 'react-hot-toast';
 
 export default function TeachersPage() {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTeachers();
+  }, []);
+
+  const loadTeachers = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllTeachers();
+      setTeachers(data);
+    } catch (error) {
+      toast.error('Failed to load teachers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this teacher?')) return;
+
+    try {
+      await deleteTeacher(id);
+      setTeachers(prev => prev.filter(t => t.id !== id));
+      toast.success('Teacher deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete teacher');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -66,7 +82,7 @@ export default function TeachersPage() {
       {/* Teachers Table */}
       <Card className="bg-neutral-900 border-neutral-800">
         <CardHeader>
-          <CardTitle className="text-white">Teachers ({mockTeachers.length})</CardTitle>
+          <CardTitle className="text-white">Teachers ({teachers.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -74,7 +90,7 @@ export default function TeachersPage() {
               <thead>
                 <tr className="border-b border-neutral-800">
                   <th className="text-left py-3 px-4 text-sm font-medium text-neutral-400">Name</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-neutral-400">Subject</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-neutral-400">Subjects</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-neutral-400">Email</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-neutral-400">Phone</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-neutral-400">Status</th>
@@ -82,29 +98,46 @@ export default function TeachersPage() {
                 </tr>
               </thead>
               <tbody>
-                {mockTeachers.map((teacher) => (
-                  <tr key={teacher.id} className="border-b border-neutral-800 hover:bg-neutral-800/50">
-                    <td className="py-3 px-4 text-white font-medium">{teacher.name}</td>
-                    <td className="py-3 px-4 text-neutral-300">{teacher.subject}</td>
-                    <td className="py-3 px-4 text-neutral-300">{teacher.email}</td>
-                    <td className="py-3 px-4 text-neutral-300">{teacher.phone}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900/20 text-green-400">
-                        {teacher.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-white">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-red-400">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                {teachers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 px-4 text-center text-neutral-400">
+                      No teachers found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  teachers.map((teacher) => (
+                    <tr key={teacher.id} className="border-b border-neutral-800 hover:bg-neutral-800/50">
+                      <td className="py-3 px-4 text-white font-medium">
+                        {teacher.firstname} {teacher.lastname}
+                      </td>
+                      <td className="py-3 px-4 text-neutral-300">
+                        {teacher.subjectIds?.join(', ') || 'N/A'}
+                      </td>
+                      <td className="py-3 px-4 text-neutral-300">{teacher.email}</td>
+                      <td className="py-3 px-4 text-neutral-300">{teacher.phone}</td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900/20 text-green-400">
+                          Active
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-white">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-neutral-400 hover:text-red-400"
+                            onClick={() => teacher.id && handleDelete(teacher.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

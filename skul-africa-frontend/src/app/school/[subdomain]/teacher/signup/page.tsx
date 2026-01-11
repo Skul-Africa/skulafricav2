@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { api } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function TeacherSignupPage() {
   const params = useParams();

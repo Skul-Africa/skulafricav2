@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, BookOpen, DollarSign, TrendingUp, Calendar, Bell, CheckCircle, AlertCircle } from 'lucide-react';
-import { getSchoolRelationships, getResults, getAttendance, getNotifications } from '@/lib/school-mis-data';
+import { Users, BookOpen, DollarSign, TrendingUp, Calendar, Bell, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { getAllStudents, getAllTeachers, getAllClassrooms, getActiveAcademicYear, startNewAcademicYear, endCurrentAcademicYear, endCurrentAcademicTerm } from '@/lib/api';
+import { toast } from 'react-hot-toast';
 
 export default function AdminDashboardPage() {
   const params = useParams();
@@ -20,56 +21,88 @@ export default function AdminDashboardPage() {
     pendingPayments: 0,
     unreadNotifications: 0
   });
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [academicYear, setAcademicYear] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [academicLoading, setAcademicLoading] = useState(false);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        const relationships = await getSchoolRelationships(subdomain);
-        const results = getResults(subdomain);
-        const attendance = getAttendance(subdomain);
-        const notifications = getNotifications(subdomain);
-
-        // Calculate today's attendance
-        const today = new Date().toISOString().split('T')[0];
-        const todayAttendance = attendance.filter(record => record.date === today);
-        const presentToday = todayAttendance.filter(record => record.status === 'present').length;
-        const totalAttendanceToday = todayAttendance.length;
-        const attendanceRate = totalAttendanceToday > 0 ? Math.round((presentToday / totalAttendanceToday) * 100) : 0;
-
-        // Get unique classes
-        const classes = [...new Set(relationships.students.map(s => s.class))];
-
-        // Get unread notifications
-        const unreadCount = notifications.filter(n => !n.read).length;
-
-        setStats({
-          totalStudents: relationships.students.length,
-          totalTeachers: relationships.teachers.length,
-          totalParents: relationships.parents.length,
-          totalClasses: classes.length,
-          todayAttendance: attendanceRate,
-          totalResults: results.length,
-          pendingPayments: 0, // Will be implemented with payments system
-          unreadNotifications: unreadCount
-        });
-
-        // Get recent activity (last 5 notifications)
-        const recentNotifications = notifications
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .slice(0, 5);
-
-        setRecentActivity(recentNotifications);
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadDashboardData();
-  }, [subdomain]);
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [students, teachers, classrooms, year] = await Promise.all([
+        getAllStudents(),
+        getAllTeachers(),
+        getAllClassrooms(),
+        getActiveAcademicYear()
+      ]);
+
+      setStats({
+        totalStudents: students.length,
+        totalTeachers: teachers.length,
+        totalParents: 0, // TODO: Implement parents API
+        totalClasses: classrooms.length,
+        todayAttendance: 0, // TODO: Implement attendance API
+        totalResults: 0, // TODO: Implement results API
+        pendingPayments: 0, // TODO: Implement payments API
+        unreadNotifications: 0 // TODO: Implement notifications API
+      });
+
+      setAcademicYear(year);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      toast.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartNewYear = async () => {
+    if (!confirm('Are you sure you want to start a new academic year? This will end the current year.')) return;
+
+    try {
+      setAcademicLoading(true);
+      await startNewAcademicYear();
+      toast.success('New academic year started successfully');
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to start new academic year');
+    } finally {
+      setAcademicLoading(false);
+    }
+  };
+
+  const handleEndCurrentYear = async () => {
+    if (!confirm('Are you sure you want to end the current academic year?')) return;
+
+    try {
+      setAcademicLoading(true);
+      await endCurrentAcademicYear();
+      toast.success('Academic year ended successfully');
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to end academic year');
+    } finally {
+      setAcademicLoading(false);
+    }
+  };
+
+  const handleEndCurrentTerm = async () => {
+    if (!confirm('Are you sure you want to end the current academic term?')) return;
+
+    try {
+      setAcademicLoading(true);
+      await endCurrentAcademicTerm();
+      toast.success('Academic term ended successfully');
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to end academic term');
+    } finally {
+      setAcademicLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -201,31 +234,62 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      {/* Academic Year Management */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-neutral-900 border-neutral-800">
           <CardHeader>
-            <CardTitle className="text-white">Recent Activity</CardTitle>
+            <CardTitle className="text-white">Academic Year Management</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.length === 0 ? (
-                <div className="text-center py-8">
-                  <Bell className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
-                  <p className="text-neutral-400">No recent activity</p>
+              {academicYear ? (
+                <div className="space-y-3">
+                  <div className="p-4 bg-neutral-800 rounded-lg">
+                    <h3 className="font-medium text-white mb-2">Current Academic Year</h3>
+                    <p className="text-sm text-neutral-300">{academicYear.name}</p>
+                    <p className="text-xs text-neutral-400 mt-1">
+                      Status: <span className={`font-medium ${academicYear.isActive ? 'text-green-400' : 'text-red-400'}`}>
+                        {academicYear.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleStartNewYear}
+                      disabled={academicLoading}
+                      className="w-full bg-primary hover:bg-primary/90"
+                    >
+                      {academicLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      Start New Academic Year
+                    </Button>
+
+                    <Button
+                      onClick={handleEndCurrentYear}
+                      disabled={academicLoading}
+                      variant="outline"
+                      className="w-full border-neutral-700 text-neutral-300"
+                    >
+                      {academicLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      End Current Year
+                    </Button>
+
+                    <Button
+                      onClick={handleEndCurrentTerm}
+                      disabled={academicLoading}
+                      variant="outline"
+                      className="w-full border-neutral-700 text-neutral-300"
+                    >
+                      {academicLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      End Current Term
+                    </Button>
+                  </div>
                 </div>
               ) : (
-                recentActivity.map((activity: any) => (
-                  <div key={activity.id} className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm text-white">{activity.title}</p>
-                      <p className="text-xs text-neutral-400">
-                        {new Date(activity.date).toLocaleDateString()} • {activity.userType}
-                      </p>
-                    </div>
-                  </div>
-                ))
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
+                  <p className="text-neutral-400">No academic year data available</p>
+                </div>
               )}
             </div>
           </CardContent>

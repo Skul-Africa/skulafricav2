@@ -1,28 +1,45 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, BarChart3, UserCheck, Bell } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { BookOpen, BarChart3, UserCheck, Bell, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
 
 export default function StudentDashboardPage() {
-  const params = useParams();
-  const subdomain = params.subdomain as string;
-  const [student, setStudent] = useState<any>(null);
+  const { user, loading } = useAuth();
+  const [stats, setStats] = useState({
+    classes: 0,
+    averageGrade: 0,
+    attendance: 0,
+    announcements: 0
+  });
 
   useEffect(() => {
-    const currentStudent = JSON.parse(localStorage.getItem(`${subdomain}-current-student`) || 'null');
-    setStudent(currentStudent);
-  }, [subdomain]);
+    // TODO: Load real stats from API
+    setStats({
+      classes: 5,
+      averageGrade: 85,
+      attendance: 92,
+      announcements: 3
+    });
+  }, []);
 
-  if (!student) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <div>Please log in to access your dashboard.</div>;
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {student.firstName}!</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {(user as any).firstname}!</h1>
         <p className="text-neutral-400">Here's your academic overview</p>
       </div>
 
@@ -33,7 +50,7 @@ export default function StudentDashboardPage() {
             <BookOpen className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">5</div>
+            <div className="text-2xl font-bold text-white">{stats.classes}</div>
             <p className="text-xs text-neutral-400">Active courses</p>
           </CardContent>
         </Card>
@@ -44,7 +61,7 @@ export default function StudentDashboardPage() {
             <BarChart3 className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">85%</div>
+            <div className="text-2xl font-bold text-white">{stats.averageGrade}%</div>
             <p className="text-xs text-neutral-400">Current semester</p>
           </CardContent>
         </Card>
@@ -55,7 +72,7 @@ export default function StudentDashboardPage() {
             <UserCheck className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">92%</div>
+            <div className="text-2xl font-bold text-white">{stats.attendance}%</div>
             <p className="text-xs text-neutral-400">This month</p>
           </CardContent>
         </Card>
@@ -66,7 +83,7 @@ export default function StudentDashboardPage() {
             <Bell className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">3</div>
+            <div className="text-2xl font-bold text-white">{stats.announcements}</div>
             <p className="text-xs text-neutral-400">New messages</p>
           </CardContent>
         </Card>
