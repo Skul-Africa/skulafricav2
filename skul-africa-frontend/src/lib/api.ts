@@ -11,6 +11,7 @@ import {
   Classroom,
   AcademicYear,
   GalleryItem,
+  PublicSchoolData,
   ApiResponse,
 } from '@/types/api';
 
@@ -277,4 +278,16 @@ export const logout = (): void => {
   localStorage.removeItem('authToken');
   localStorage.removeItem('schoolData');
   toast.success('Logged out successfully');
+};
+
+// Public School Data
+export const getSchoolPublicData = async (subdomain: string): Promise<PublicSchoolData> => {
+  const response = await api.get(`/api/v1/schools/${subdomain}/public`);
+  return handleResponse(response);
+};
+
+export const updateSchoolPublicContent = async (id: string, data: Partial<PublicSchoolData>): Promise<PublicSchoolData> => {
+  const response = await api.put(`/api/v1/schools/${id}/public-content`, data);
+  toast.success('Public content updated successfully');
+  return handleResponse(response);
 };

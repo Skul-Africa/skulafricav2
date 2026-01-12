@@ -109,6 +109,78 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+// Public School Data
+export interface PublicSchoolData {
+  branding: {
+    schoolName: string;
+    motto: string;
+    logo: string;
+    favicon: string;
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+    fontStyle: string;
+  };
+  homepage: {
+    hero: {
+      title: string;
+      subtitle: string;
+      bgImage: string;
+      ctaText: string;
+      ctaLink: string;
+    };
+    about: {
+      description: string;
+      vision: string;
+      mission: string;
+      image: string;
+    };
+    academics: Array<{
+      id: string;
+      title: string;
+      description: string;
+      image: string;
+    }>;
+    gallery: string[];
+    testimonials: Array<{
+      id: string;
+      name: string;
+      role: string;
+      content: string;
+      image: string;
+    }>;
+  };
+  visibility: {
+    hero: boolean;
+    about: boolean;
+    academics: boolean;
+    gallery: boolean;
+    testimonials: boolean;
+    contact: boolean;
+  };
+  theme: {
+    mode: 'classic' | 'minimal' | 'modern' | 'dark' | 'gradient';
+  };
+  contact: {
+    email: string;
+    phone: string;
+    address: string;
+    socials: {
+      facebook: string;
+      instagram: string;
+      twitter: string;
+      whatsapp: string;
+    };
+  };
+  navigation: {
+    links: Array<{ id: string; label: string; href: string }>;
+  };
+  footer: {
+    text: string;
+    copyright: string;
+  };
+}
+
 // Error response
 export interface ApiError {
   message: string;

@@ -1,31 +1,61 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useSchoolCustomization } from '@/hooks/useSchoolCustomization';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getSchoolPublicData, updateSchoolPublicContent } from '@/lib/api';
+import { PublicSchoolData } from '@/types/api';
 import { Button } from '@/components/ui/button';
-import { Facebook, Instagram, Twitter, Phone, Mail, MapPin, Menu } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Phone, Mail, MapPin, Menu, Edit, Save, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function SchoolHomepage() {
   const params = useParams();
   const subdomain = params.subdomain as string;
-  const {
-    branding,
-    homepage,
-    visibility,
-    theme,
-    contact,
-    navigation,
-    footer,
-    isLoaded,
-  } = useSchoolCustomization(subdomain);
+  const { isAuthenticated, user, role } = useAuth();
+  const [data, setData] = useState<PublicSchoolData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editedData, setEditedData] = useState<Partial<PublicSchoolData>>({});
 
-  if (!isLoaded) {
+  const isAdminView = isAuthenticated && role === 'school' && (user as any)?.subdomain === subdomain;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const publicData = await getSchoolPublicData(subdomain);
+        setData(publicData);
+      } catch (error) {
+        console.error('Failed to fetch public data', error);
+        // Fallback to defaults if API fails
+        setData({
+          branding: { schoolName: 'School Name', motto: '', logo: '', favicon: '', primaryColor: '#000000', secondaryColor: '#ffffff', accentColor: '#3b82f6', fontStyle: 'Inter' },
+          homepage: { hero: { title: 'Welcome', subtitle: '', bgImage: '', ctaText: 'Apply Now', ctaLink: '' }, about: { description: '', vision: '', mission: '', image: '' }, academics: [], gallery: [], testimonials: [] },
+          visibility: { hero: true, about: true, academics: true, gallery: true, testimonials: true, contact: true },
+          theme: { mode: 'modern' },
+          contact: { email: '', phone: '', address: '', socials: { facebook: '', instagram: '', twitter: '', whatsapp: '' } },
+          navigation: { links: [] },
+          footer: { text: '', copyright: '' }
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [subdomain]);
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900"></div>
       </div>
     );
   }
+
+  if (!data) return null;
+
+  const currentData = editing ? { ...data, ...editedData } : data;
+  const { branding, homepage, visibility, theme, contact, navigation, footer } = currentData;
 
   // Theme classes mapping
   const getThemeClasses = () => {
@@ -42,6 +72,29 @@ export default function SchoolHomepage() {
   const getPrimaryColor = () => branding.primaryColor || '#000000';
   const getSecondaryColor = () => branding.secondaryColor || '#ffffff';
   const getAccentColor = () => branding.accentColor || '#3b82f6';
+
+  const handleEdit = () => {
+    setEditing(true);
+    setEditedData({});
+  };
+
+  const handleSave = async () => {
+    if (!user?.id) return;
+    try {
+      const updated = await updateSchoolPublicContent(user.id, editedData);
+      setData(updated);
+      setEditing(false);
+      setEditedData({});
+    } catch (error) {
+      console.error('Failed to save', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditing(false);
+    setEditedData({});
+  };
+
 
   return (
     <div className={`min-h-screen w-full ${getThemeClasses()}`} style={{ fontFamily: branding.fontStyle }}>
@@ -70,6 +123,27 @@ export default function SchoolHomepage() {
           <div className="md:hidden">
             <Menu className="h-6 w-6" />
           </div>
+          {isAdminView && (
+            <div className="flex gap-2">
+              {!editing ? (
+                <Button onClick={handleEdit} size="sm" variant="outline">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button onClick={handleSave} size="sm" style={{ backgroundColor: getAccentColor() }}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                  <Button onClick={handleCancel} size="sm" variant="outline">
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -85,19 +159,44 @@ export default function SchoolHomepage() {
             </div>
           )}
           <div className="container relative z-10 mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: homepage.hero.bgImage ? 'white' : 'inherit' }}>
-              {homepage.hero.title}
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90" style={{ color: homepage.hero.bgImage ? 'rgba(255,255,255,0.9)' : 'inherit' }}>
-              {homepage.hero.subtitle}
-            </p>
-            <Button
-              size="lg"
-              className="text-lg px-8"
-              style={{ backgroundColor: getAccentColor(), color: '#ffffff' }}
-            >
-              {homepage.hero.ctaText}
-            </Button>
+            {editing ? (
+              <>
+                <input
+                  value={currentData.homepage.hero.title}
+                  onChange={(e) => setEditedData(prev => ({ ...prev, homepage: { ...data!.homepage, ...prev.homepage, hero: { ...data!.homepage.hero, ...prev.homepage?.hero, title: e.target.value } } }))}
+                  className="text-4xl md:text-6xl font-bold mb-6 bg-transparent border-b border-white text-center w-full"
+                  style={{ color: homepage.hero.bgImage ? 'white' : 'inherit' }}
+                />
+                <textarea
+                  value={currentData.homepage.hero.subtitle}
+                  onChange={(e) => setEditedData(prev => ({ ...prev, homepage: { ...data!.homepage, ...prev.homepage, hero: { ...data!.homepage.hero, ...prev.homepage?.hero, subtitle: e.target.value } } }))}
+                  className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90 bg-transparent border-b border-white text-center w-full resize-none"
+                  style={{ color: homepage.hero.bgImage ? 'rgba(255,255,255,0.9)' : 'inherit' }}
+                  rows={2}
+                />
+                <input
+                  value={currentData.homepage.hero.ctaText}
+                  onChange={(e) => setEditedData(prev => ({ ...prev, homepage: { ...data!.homepage, ...prev.homepage, hero: { ...data!.homepage.hero, ...prev.homepage?.hero, ctaText: e.target.value } } }))}
+                  className="text-lg px-8 bg-transparent border-b border-white text-center"
+                />
+              </>
+            ) : (
+              <>
+                <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: homepage.hero.bgImage ? 'white' : 'inherit' }}>
+                  {homepage.hero.title}
+                </h1>
+                <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90" style={{ color: homepage.hero.bgImage ? 'rgba(255,255,255,0.9)' : 'inherit' }}>
+                  {homepage.hero.subtitle}
+                </p>
+                <Button
+                  size="lg"
+                  className="text-lg px-8"
+                  style={{ backgroundColor: getAccentColor(), color: '#ffffff' }}
+                >
+                  {homepage.hero.ctaText}
+                </Button>
+              </>
+            )}
           </div>
         </section>
       )}
