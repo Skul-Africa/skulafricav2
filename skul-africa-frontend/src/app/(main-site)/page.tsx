@@ -2,16 +2,67 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Users, BookOpen, TrendingUp, Shield, Star, Globe, Zap, Layout, Smartphone } from "lucide-react";
+import { ArrowRight, CheckCircle, Users, BookOpen, TrendingUp, Shield, Star, Globe, Zap, Layout, Smartphone, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+
+function debounceFunc<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+) {
+  let timeout: NodeJS.Timeout;
+
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}
 
 export default function Home() {
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+ const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
+
+
+    const fetchSchools = async (searchTerm: string) => {
+    if (!searchTerm) {
+      setSuggestions([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `https://skul-africa.onrender.com/api/v1/schools/search?q=${searchTerm}`
+      );
+      setSuggestions(res.data);
+    } catch (err) {
+      console.error(err);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* -------- DEBOUNCED -------- */
+  const debouncedFetch = useMemo(
+    () => debounceFunc(fetchSchools, 500),
+    []
+  );
+
+  useEffect(() => {
+    debouncedFetch(query);
+  }, [query]);
+
   return (
     <div className="min-h-screen bg-black text-white selection:bg-primary selection:text-white font-sans">
       <Navbar />
@@ -47,6 +98,76 @@ export default function Home() {
             Build Your School's <br />
             <span className="text-primary">Digital Future</span>
           </h1>
+
+                    {/* -------- SCHOOL SEARCH -------- */}
+          <div className="max-w-xl mx-auto mb-10 relative">
+
+            {/* BUTTON STATE */}
+            {!openSearch && (
+              <button
+                onClick={() => setOpenSearch(true)}
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-full bg-neutral-900 border border-white/10 hover:border-primary transition text-neutral-300"
+              >
+                <Search size={20} />
+                <span>Search for a school</span>
+              </button>
+            )}
+
+            {/* INPUT STATE */}
+            {openSearch && (
+              <>
+                <Search
+                  className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-400"
+                  size={20}
+                />
+
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Search for a school..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full pl-14 pr-6 py-4 rounded-full bg-neutral-900 border border-primary focus:outline-none text-white placeholder:text-neutral-500"
+                />
+
+                {/* Close */}
+                <button
+                  onClick={() => {
+                    setOpenSearch(false);
+                    setQuery("");
+                    setSuggestions([]);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </>
+            )}
+
+            {/* Loading */}
+            {loading && (
+              <p className="absolute right-12 top-1/2 -translate-y-1/2 text-sm text-primary">
+                Searching...
+              </p>
+            )}
+
+            {/* Suggestions */}
+            {suggestions.length > 0 && (
+              <div className="absolute w-full mt-2 bg-neutral-900 border border-white/10 rounded-2xl overflow-hidden z-50">
+                {suggestions.map((school: any) => (
+                  <div
+                    key={school.id}
+                    className="px-6 py-3 hover:bg-neutral-800 cursor-pointer transition"
+                  >
+                    <p className="font-semibold">{school.name}</p>
+                    <p className="text-sm text-neutral-400">
+                      {school.location || "Nigeria"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           <p className="text-xl md:text-2xl text-neutral-400 max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
             Launch a professional website, manage students, and streamline operations with the most powerful education platform built for modern schools.
