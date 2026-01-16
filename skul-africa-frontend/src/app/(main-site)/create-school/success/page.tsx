@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle, ArrowRight, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-
 import { Suspense } from "react";
 
 function SuccessContent() {
@@ -45,12 +43,23 @@ function SuccessContent() {
                     </div>
                 </div>
 
+                {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                    {/* Visit School Site */}
                     <Link href={`/school/${subdomain}`}>
                         <Button className="w-full sm:w-auto px-8 py-6 bg-primary hover:bg-primary/90 text-white rounded-full font-bold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
                             Visit Your School Site <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                     </Link>
+
+                    {/* Admin Login */}
+                    <Link href={`/school/${subdomain}/login`}>
+                        <Button className="w-full sm:w-auto px-8 py-6 bg-primary hover:bg-primary/90 text-white rounded-full font-bold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                            Go to Admin Login <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                    </Link>
+
+                    {/* Back to Home */}
                     <Link href="/">
                         <Button variant="outline" className="w-full sm:w-auto px-8 py-6 border-neutral-800 text-white hover:bg-neutral-900 rounded-full font-bold text-lg">
                             Back to Home
