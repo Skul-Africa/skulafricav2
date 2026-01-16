@@ -11,6 +11,7 @@ export default function SignupSuccessPage() {
   const searchParams = useSearchParams();
   const subdomain = searchParams.get('subdomain');
   const [countdown, setCountdown] = useState(5);
+ 
 
   useEffect(() => {
     if (!subdomain) return;
